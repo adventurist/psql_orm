@@ -1,12 +1,12 @@
-#include "structs.h"
 #include <pqxx/pqxx>
+
+#include "structs.h"
 
 #ifndef DATABASECONNECTION_H
 #define DATABASECONNECTION_H
 
-class DatabaseConnection
-{
-public:
+class DatabaseConnection {
+ public:
   // constructor
   DatabaseConnection();
   // init db
@@ -14,22 +14,23 @@ public:
   // work
   QueryResult query(DatabaseQuery query);
   std::string query(InsertReturnQuery query);
+  std::string query(UpdateReturnQuery query);
   QueryResult query(ComparisonSelectQuery query);
   QueryResult query(ComparisonBetweenSelectQuery query);
+  QueryResult query(MultiFilterSelect query);
   // state
   std::string getDbName();
 
-private:
+ private:
   DatabaseConfiguration m_config;
   std::string m_db_name;
   pqxx::connection getConnection();
   std::string getConnectionString();
   pqxx::result performInsert(DatabaseQuery query);
   pqxx::result performInsert(InsertReturnQuery query, std::string returning);
-  pqxx::result performSelect(DatabaseQuery query);
-  pqxx::result performSelect(ComparisonSelectQuery query);
-  pqxx::result performSelect(ComparisonBetweenSelectQuery query);
-  //  bool connected;
+  template <typename T>
+  pqxx::result performSelect(T query);
+  pqxx::result performUpdate(UpdateReturnQuery query, std::string returning);
 };
 
-#endif // DATABASECONNECTION_H
+#endif  // DATABASECONNECTION_H
