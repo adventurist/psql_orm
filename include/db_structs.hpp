@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#include <vector>
 #include <variant>
+#include <vector>
 
 enum QueryType { INSERT = 0, DELETE = 1, UPDATE = 2, SELECT = 3 };
 
@@ -78,7 +78,6 @@ struct DatabaseQuery : Query {
   QueryFilter filter;
 };
 
-
 struct MultiFilterSelect {
   std::string table;
   std::vector<std::string> fields;
@@ -127,16 +126,5 @@ struct QueryResult {
   std::vector<std::pair<std::string, std::string>> values;
 };
 
-struct KApplication {
-  std::string name;
-  std::string path;
-  std::string data;
-
-  friend std::ostream &operator<<(std::ostream &out, const KApplication &app) {
-    out << "Name: " << app.name << "\nPath: " << app.path
-        << "\nData: " << app.data << std::endl;
-    return out;
-  }
-};
-
 #endif  // __DB_STRUCTS_H__
+
