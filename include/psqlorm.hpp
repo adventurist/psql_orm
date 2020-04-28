@@ -1,8 +1,6 @@
 #ifndef __PSQLORM_HPP__
 #define __PSQLORM_HPP__
 
-#include <log/logger.h>
-
 #include <database/database_connection.hpp>
 #include <variant>
 
