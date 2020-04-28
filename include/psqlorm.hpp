@@ -1,31 +1,18 @@
-#ifndef __KDB_HPP__
-#define __KDB_HPP__
+#ifndef __PSQLORM_HPP__
+#define __PSQLORM_HPP__
 
-#include <variant>
-#include <database/database_connection.hpp>
 #include <log/logger.h>
+
+#include <database/database_connection.hpp>
+#include <variant>
 
 namespace Database {
 
-auto KLOG = KLogger::GetInstance() -> get_logger();
-
-class KDB {
+class PSQLORM {
  public:
-  KDB() {
-    if (!ConfigParser::init()) {
-      KLOG->info("Unable to load config");
-      return;
-    }
-
-    m_credentials = {.user = ConfigParser::Database::user(),
-                     .password = ConfigParser::Database::pass(),
-                     .name = ConfigParser::Database::name()};
-
-    DatabaseConfiguration configuration{
-        .credentials = m_credentials, .address = "127.0.0.1", .port = "5432"};
-
+  PSQLORM(DatabaseConfiguration config) {
     m_connection = DatabaseConnection{};
-    m_connection.setConfig(configuration);
+    m_connection.setConfig(config);
   }
 
   QueryValues select(std::string table, Fields fields,
@@ -41,9 +28,9 @@ class KDB {
         return result.values;
       }
     } catch (const pqxx::sql_error &e) {
-      KLOG->info("Database error: {}. Query was {}.", e.what(), e.query());
+      throw e;
     } catch (const std::exception &e) {
-      KLOG->error("Error", e.what());
+      throw e;
     }
     return {{}};
   }
@@ -52,15 +39,15 @@ class KDB {
                      QueryComparisonFilter filter = {}) {
     try {
       ComparisonSelectQuery select_query{
-          .table = table, .fields = fields, .values={}, .filter = filter};
+          .table = table, .fields = fields, .values = {}, .filter = filter};
       QueryResult result = m_connection.query(select_query);
       if (!result.values.empty()) {
         return result.values;
       }
     } catch (const pqxx::sql_error &e) {
-      KLOG->info("Database error: {}. Query was {}.", e.what(), e.query());
+      throw e;
     } catch (const std::exception &e) {
-      KLOG->error("Error", e.what());
+      throw e;
     }
     return {{}};
   }
@@ -75,9 +62,9 @@ class KDB {
         return result.values;
       }
     } catch (const pqxx::sql_error &e) {
-      KLOG->info("Database error: {}. Query was {}.", e.what(), e.query());
+      throw e;
     } catch (const std::exception &e) {
-      KLOG->error("Error", e.what());
+      throw e;
     }
     return {{}};
   }
@@ -92,30 +79,31 @@ class KDB {
         return result.values;
       }
     } catch (const pqxx::sql_error &e) {
-      KLOG->info("Database error: {}. Query was {}.", e.what(), e.query());
+      throw e;
     } catch (const std::exception &e) {
-      KLOG->error("Error", e.what());
+      throw e;
     }
     return {{}};
   }
 
   template <typename FilterA, typename FilterB>
-  QueryValues selectMultiFilter(std::string table, Fields fields,
-                                std::vector<std::variant<FilterA, FilterB> > filters) {
+  QueryValues selectMultiFilter(
+      std::string table, Fields fields,
+      std::vector<std::variant<FilterA, FilterB> > filters) {
     try {
       MultiVariantFilterSelect select_query{
           .table = table, .fields = fields, .filter = filters};
       QueryResult result = m_connection.query(select_query);
-      for (const auto& value : result.values) {
+      for (const auto &value : result.values) {
         std::cout << "Query value: " << value.second << std::endl;
       }
       if (!result.values.empty()) {
         return result.values;
       }
     } catch (const pqxx::sql_error &e) {
-      KLOG->info("Database error: {}. Query was {}.", e.what(), e.query());
+      throw e;
     } catch (const std::exception &e) {
-      KLOG->error("Error", e.what());
+      throw e;
     }
     return {{}};
   }
@@ -123,16 +111,20 @@ class KDB {
   std::string update(std::string table, Fields fields, Values values,
                      QueryFilter filter, std::string returning) {
     try {
-      // TODO: At the moment, we are married to passing the "id" field name as the "returning" argument
-      UpdateReturnQuery update_query{
-          .table = table, .fields = fields, .type = QueryType::UPDATE, .values = values, .filter = filter, .returning = returning};
+      // TODO: At the moment, we are married to passing the "id" field name as
+      // the "returning" argument
+      UpdateReturnQuery update_query{.table = table,
+                                     .fields = fields,
+                                     .type = QueryType::UPDATE,
+                                     .values = values,
+                                     .filter = filter,
+                                     .returning = returning};
       std::string result = m_connection.query(update_query);
-      KLOG->info("Returned result from DB layer: {}", result);
       return result;
     } catch (const pqxx::sql_error &e) {
-      KLOG->info("Database error: {}. Query was {}.", e.what(), e.query());
+      throw e;
     } catch (const std::exception &e) {
-      KLOG->error("Error", e.what());
+      throw e;
     }
     return "";
   }
@@ -145,9 +137,9 @@ class KDB {
     try {
       QueryResult result = m_connection.query(insert_query);
     } catch (const pqxx::sql_error &e) {
-      KLOG->info("Database error: {}. Query was {}.", e.what(), e.query());
+      throw e;
     } catch (const std::exception &e) {
-      KLOG->error("Error", e.what());
+      throw e;
     }
     return true;
   }
@@ -162,9 +154,9 @@ class KDB {
     try {
       return m_connection.query(insert_query);
     } catch (const pqxx::sql_error &e) {
-      KLOG->info("Database error: {}. Query was {}.", e.what(), e.query());
+      throw e;
     } catch (const std::exception &e) {
-      KLOG->error("Error", e.what());
+      throw e;
     }
   }
 
@@ -175,4 +167,4 @@ class KDB {
 
 }  // namespace Database
 
-#endif  // __KDB_HPP__
+#endif  // __PSQLORM_HPP__
