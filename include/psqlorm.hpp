@@ -1,7 +1,7 @@
 #ifndef __PSQLORM_HPP__
 #define __PSQLORM_HPP__
 
-#include <database/database_connection.hpp>
+#include <database_connection.hpp>
 #include <variant>
 
 namespace Database {
