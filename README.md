@@ -1,3 +1,5 @@
-# PSQLORM
+# PSQL_ORM aka KDB
 
-A wrapping library to facilitate the use of (libpqxx)[https://github.com/jtv/libpqxx]
+Used by the KIQ Platform
+
+Provides an interface to [PQXX](https://github.com/jtv/libpqxx), a great library.
