@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#include <variant>
 #include <vector>
+#include <variant>
 
 enum QueryType { INSERT = 0, DELETE = 1, UPDATE = 2, SELECT = 3 };
 
@@ -78,16 +78,18 @@ struct DatabaseQuery : Query {
   QueryFilter filter;
 };
 
+
 struct MultiFilterSelect {
   std::string table;
   std::vector<std::string> fields;
   std::vector<GenericFilter> filter;
 };
 
+template <typename T>
 struct MultiVariantFilterSelect {
   std::string table;
   std::vector<std::string> fields;
-  std::vector<std::variant<CompBetweenFilter, MultiOptionFilter>> filter;
+  T filter;
 };
 
 struct InsertReturnQuery : Query {
@@ -126,5 +128,27 @@ struct QueryResult {
   std::vector<std::pair<std::string, std::string>> values;
 };
 
-#endif  // __DB_STRUCTS_H__
+enum JoinType {
+  INNER = 0x00,
+  OUTER = 0x01
+};
 
+struct Join {
+  std::string table;
+  std::string field;
+  std::string join_table;
+  std::string join_field;
+  JoinType    type;
+};
+
+using Joins = std::vector<Join>;
+
+template <typename T>
+struct JoinQuery : MultiVariantFilterSelect<T> {
+  std::string              table;
+  std::vector<std::string> fields;
+  T                        filter;
+  Joins                    joins;
+};
+
+#endif  // __DB_STRUCTS_H__
