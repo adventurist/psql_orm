@@ -10,6 +10,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 file(GLOB_RECURSE SOURCE true src/*.cpp)
 add_library(${PROJECT_NAME} STATIC ${SOURCE})
 target_include_directories(${PROJECT_NAME} PRIVATE
-   "include"
+   "src"
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PQXX_LIB} ${PQ_LIB})

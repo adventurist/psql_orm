@@ -1,7 +1,8 @@
 #ifndef __PSQLORM_HPP__
 #define __PSQLORM_HPP__
 
-#include <database_connection.hpp>
+#include "database_connection.hpp"
+#include "db_structs.hpp"
 #include <variant>
 
 namespace Database {
@@ -22,21 +23,21 @@ class PSQLORM {
     try {
       QueryResult result = m_connection->query(
         DatabaseQuery{
-          .table = table,
+          .table  = table,
           .fields = fields,
-          .type = QueryType::SELECT,
+          .type   = QueryType::SELECT,
           .values = {},
           .filter = filter
         });
-      if (!result.values.empty()) {
+      if (!result.values.empty())
         return result.values;
-      }
+
     } catch (const pqxx::sql_error &e) {
       throw e;
     } catch (const std::exception &e) {
       throw e;
     }
-    return {{}};
+    return QueryValues{};
   }
 
   QueryValues select(std::string table, Fields fields,
@@ -44,7 +45,7 @@ class PSQLORM {
     try {
       QueryResult result = m_connection->query(
         ComparisonSelectQuery{
-          .table = table,
+          .table  = table,
           .fields = fields,
           .values = {},
           .filter = filter
@@ -57,7 +58,7 @@ class PSQLORM {
     } catch (const std::exception &e) {
       throw e;
     }
-    return {{}};
+    return QueryValues{};
   }
 
   QueryValues selectCompare(std::string table, Fields fields,
@@ -78,7 +79,7 @@ class PSQLORM {
     } catch (const std::exception &e) {
       throw e;
     }
-    return {{}};
+    return QueryValues{};
   }
 
   QueryValues selectMultiFilter(std::string table, Fields fields,
@@ -98,7 +99,7 @@ class PSQLORM {
     } catch (const std::exception &e) {
       throw e;
     }
-    return {{}};
+    return QueryValues{};
   }
 
   template <typename FilterA, typename FilterB>
@@ -145,7 +146,7 @@ class PSQLORM {
     } catch (const std::exception &e) {
       throw e;
     }
-    return {{}};
+    return QueryValues{};
   }
 
   template <typename T>
@@ -166,7 +167,7 @@ class PSQLORM {
     } catch (const std::exception &e) {
       throw e;
     }
-    return {{}};
+    return QueryValues{};
   }
 
   std::string update(std::string table, Fields fields, Values values,

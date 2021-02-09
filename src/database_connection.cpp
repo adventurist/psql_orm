@@ -1,4 +1,4 @@
-#include <database_connection.hpp>
+#include "database_connection.hpp"
 #include <iostream>
 #include <memory>
 #include <pqxx/pqxx>
@@ -452,6 +452,8 @@ template QueryResult DatabaseConnection::query(
 template QueryResult DatabaseConnection::query(
   JoinQuery<std::vector<std::variant<CompFilter, CompBetweenFilter, MultiOptionFilter>>>
 );
+
+template QueryResult DatabaseConnection::query<ComparisonSelectQuery>(ComparisonSelectQuery);
 
 template QueryResult DatabaseConnection::query(
   JoinQuery<QueryFilter>
