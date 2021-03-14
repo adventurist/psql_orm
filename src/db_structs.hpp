@@ -1,5 +1,4 @@
-#ifndef __DB_STRUCTS_H__
-#define __DB_STRUCTS_H__
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -51,6 +50,8 @@ struct CompFilter {
   std::string b;
   std::string sign;
 };
+
+using CompJoinFilter = std::vector<CompFilter>;
 
 struct CompBetweenFilter {
   std::string field;
@@ -151,4 +152,10 @@ struct JoinQuery : MultiVariantFilterSelect<T> {
   Joins                    joins;
 };
 
-#endif  // __DB_STRUCTS_H__
+template <typename T = CompJoinFilter>
+struct SimpleJoinQuery{
+  std::string              table;
+  std::vector<std::string> fields;
+  T                        filter;
+  Join                     join;
+};

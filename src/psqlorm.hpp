@@ -1,5 +1,4 @@
-#ifndef __PSQLORM_HPP__
-#define __PSQLORM_HPP__
+#pragma once
 
 #include "database_connection.hpp"
 #include "db_structs.hpp"
@@ -170,6 +169,25 @@ class PSQLORM {
     return QueryValues{};
   }
 
+  template <typename T = QueryFilter>
+  QueryValues selectSimpleJoin(std::string table, Fields fields, T filter, Join join) {
+    try {
+      SimpleJoinQuery<T> select_query{
+        .table  = table,
+        .fields = fields,
+        .filter = filter,
+        .join   = join
+      };
+      QueryResult result = m_connection->query(select_query);
+      return result.values;
+
+    } catch (const pqxx::sql_error &e) {
+      throw e;
+    } catch (const std::exception &e) {
+      throw e;
+    }
+  }
+
   std::string update(std::string table, Fields fields, Values values,
                      QueryFilter filter, std::string returning) {
     try {
@@ -259,5 +277,3 @@ class PSQLORM {
 };
 
 }  // namespace Database
-
-#endif  // __PSQLORM_HPP__
